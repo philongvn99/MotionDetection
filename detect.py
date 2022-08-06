@@ -3,13 +3,18 @@ import argparse
 from get_background import get_background
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-i', '--input', help='path to the input video',
-                    required=True)
-parser.add_argument('-c', '--consecutive-frames', default=4, type=int,
-                    dest='consecutive_frames', help='path to the input video')
+parser.add_argument("-i", "--input", help="path to the input video", required=True)
+parser.add_argument(
+    "-c",
+    "--consecutive-frames",
+    default=4,
+    type=int,
+    dest="consecutive_frames",
+    help="path to the input video",
+)
 args = vars(parser.parse_args())
 
-inputArg = 0 if args['input'] == '0' else args['input']
+inputArg = 0 if args["input"] == "0" else args["input"]
 
 
 cap = cv2.VideoCapture(inputArg)
@@ -19,9 +24,7 @@ frame_height = int(cap.get(4))
 save_name = f"/outputs/{args['input'].split('/')[-1]}"
 # define codec and create VideoWriter object
 out = cv2.VideoWriter(
-    save_name,
-    cv2.VideoWriter_fourcc(*'mp4v'), 10,
-    (frame_width, frame_height)
+    save_name, cv2.VideoWriter_fourcc(*"mp4v"), 10, (frame_width, frame_height)
 )
 
 
@@ -30,10 +33,10 @@ background = get_background(inputArg)
 # convert the background model to grayscale format
 background = cv2.cvtColor(background, cv2.COLOR_BGR2GRAY)
 frame_count = 0
-consecutive_frame = args['consecutive_frames']
+consecutive_frame = args["consecutive_frames"]
 
 
-while (cap.isOpened()):
+while cap.isOpened():
     ret, frame = cap.read()
     if ret == True:
         frame_count += 1
@@ -57,7 +60,8 @@ while (cap.isOpened()):
             sum_frames = sum(frame_diff_list)
             # find the contours around the white segmented areas
             contours, hierarchy = cv2.findContours(
-                sum_frames, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                sum_frames, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+            )
             # draw the contours, not strictly necessary
             for i, cnt in enumerate(contours):
                 cv2.drawContours(frame, contours, i, (0, 0, 255), 3)
@@ -69,13 +73,15 @@ while (cap.isOpened()):
                 # get the xmin, ymin, width, and height coordinates from the contours
                 (x, y, w, h) = cv2.boundingRect(contour)
                 # draw the bounding boxes
-                cv2.rectangle(orig_frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+                cv2.rectangle(orig_frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-            cv2.imshow('Detected Objects', orig_frame)
+            cv2.imshow("Detected Objects", orig_frame)
             out.write(orig_frame)
-            if cv2.waitKey(100) & 0xFF == ord('q'):
+            if cv2.waitKey(100) & 0xFF == ord("q"):
                 break
     else:
         break
 cap.release()
 cv2.destroyAllWindows()
+
+# hahaha
